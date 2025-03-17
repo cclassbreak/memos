@@ -65,7 +65,7 @@ const PreferencesSection = observer(() => {
             }
           }}
         >
-          {[Visibility.PRIVATE, Visibility.PROTECTED, Visibility.PUBLIC]
+          {[Visibility.PROTECTED,Visibility.PRIVATE]
             .map((v) => convertVisibilityToString(v))
             .map((item) => (
               <Option key={item} value={item} className="whitespace-nowrap">
@@ -77,7 +77,7 @@ const PreferencesSection = observer(() => {
 
       <Divider className="!my-3" />
 
-      <WebhookSection />
+      {/* <WebhookSection /> */}
     </div>
   );
 });

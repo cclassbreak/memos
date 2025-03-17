@@ -19,3 +19,5 @@ dist
 
 # VSCode settings
 .vscode
+proto/gen/*
+proto/gen/api/v1/inbox_service.pb.gw.go

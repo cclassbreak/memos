@@ -7,6 +7,7 @@ interface Props {
   renderer: (memo: Memo) => JSX.Element;
   prefixElement?: JSX.Element;
   listMode?: boolean;
+  fullWidth?: boolean;  // New parameter
 }
 
 interface LocalState {
@@ -54,9 +55,17 @@ const MasonryView = (props: Props) => {
       }}
     >
       {Array.from({ length: state.columns }).map((_, columnIndex) => (
-        <div key={columnIndex} className="min-w-0 mx-auto w-full max-w-2xl">
+        <div
+          key={columnIndex}
+          className={cn(
+            "min-w-0 w-full", 
+            props.fullWidth ? "" : "mx-auto max-w-2xl" // Apply styles conditionally
+          )}
+        >
           {props.prefixElement && columnIndex === 0 && <div className="mb-2">{props.prefixElement}</div>}
-          {props.memoList.filter((_, index) => index % state.columns === columnIndex).map((memo) => props.renderer(memo))}
+          {props.memoList
+            .filter((_, index) => index % state.columns === columnIndex)
+            .map((memo) => props.renderer(memo))}
         </div>
       ))}
     </div>

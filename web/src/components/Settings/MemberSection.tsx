@@ -124,6 +124,50 @@ const MemberSection = () => {
     }
   };
 
+  const handlePromoteToAdminClick = async (user: User) => {
+    const confirmed = window.confirm(t("setting.member-section.promote-to-admin-warning", { username: user.nickname }));
+    if (confirmed) {
+      const response = await userServiceClient.updateUser({
+        user: {
+          name: user.name,
+          role: User_Role.ADMIN,
+        },
+        updateMask: ["role"],
+      });
+      console.log("UpdateUser Response:", response);
+      fetchUsers();
+    }
+  };
+
+  const handlePromoteToHostClick = async (user: User) => {
+    const confirmed = window.confirm(t("setting.member-section.promote-to-host-warning", { username: user.nickname }));
+    if (confirmed) {
+      const response = await userServiceClient.updateUser({
+        user: {
+          name: user.name,
+          role: User_Role.HOST,
+        },
+        updateMask: ["role"],
+      });
+      console.log("UpdateUser Response:", response);
+      fetchUsers();
+    }
+  };
+
+  const handleDemoteToUserClick = async (user: User) => {
+    const confirmed = window.confirm(t("setting.member-section.demote-to-user-warning", { username: user.nickname }));
+    if (confirmed) {
+      await userServiceClient.updateUser({
+        user: {
+          name: user.name,
+          role: User_Role.USER,
+        },
+        updateMask: ["role"],
+      });
+      fetchUsers();
+    }
+  };
+
   const handleRestoreUserClick = async (user: User) => {
     await userServiceClient.updateUser({
       user: {
@@ -225,6 +269,16 @@ const MemberSection = () => {
                           <MenuItem onClick={() => handleChangePasswordClick(user)}>
                             {t("setting.account-section.change-password")}
                           </MenuItem>
+                          {user.role === User_Role.USER ? (
+                            <>
+                            <MenuItem onClick={() => handlePromoteToHostClick(user)}>{t("setting.member-section.promote-to-host")}</MenuItem> 
+                            <MenuItem onClick={() => handlePromoteToAdminClick(user)}>{t("setting.member-section.promote-to-admin")}</MenuItem> 
+                            </>
+                            
+                            ) : (
+                            <MenuItem onClick={() => handleDemoteToUserClick(user)}>{t("setting.member-section.demote-to-user")}</MenuItem>
+                            )
+                          }
                           {user.state === State.NORMAL ? (
                             <MenuItem onClick={() => handleArchiveUserClick(user)}>{t("setting.member-section.archive-member")}</MenuItem>
                           ) : (

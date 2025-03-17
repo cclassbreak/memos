@@ -3,6 +3,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "preview": "vite preview",
     "release": "vite build --mode release --outDir=../server/router/frontend/dist --emptyOutDir",
     "lint": "eslint --ext .js,.ts,.tsx, src",
     "type-check": "tsc --noEmit --skipLibCheck",
@@ -85,7 +86,9 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@bufbuild/buf",
-      "esbuild"
+      "core-js",
+      "esbuild",
+      "protobufjs"
     ]
   }
 }

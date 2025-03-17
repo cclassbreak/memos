@@ -42,7 +42,9 @@ const PagedMemoList = observer((props: Props) => {
     nextPageToken: "",
   });
   const sortedMemoList = props.listSort ? props.listSort(memoList.value) : memoList.value;
-  const showMemoEditor = Boolean(matchPath(Routes.ROOT, window.location.pathname));
+  const showMemoEditor = Boolean(matchPath(Routes.ROOT, window.location.pathname) || 
+    matchPath(Routes.EXPLORE, window.location.pathname)||
+    matchPath(Routes.INTEGRATE, window.location.pathname));
 
   const fetchMoreMemos = async (nextPageToken: string) => {
     setState((state) => ({ ...state, isRequesting: true }));
@@ -77,7 +79,8 @@ const PagedMemoList = observer((props: Props) => {
         memoList={sortedMemoList}
         renderer={props.renderer}
         prefixElement={showMemoEditor ? <MemoEditor className="mb-2" cacheKey="home-memo-editor" /> : undefined}
-        listMode={viewStore.state.layout === "LIST"}
+        listMode={Boolean(viewStore.state.layout === "LIST" || matchPath(Routes.INTEGRATE, window.location.pathname))}
+        fullWidth={Boolean(matchPath(Routes.INTEGRATE, window.location.pathname))}
       />
       {state.isRequesting && (
         <div className="w-full flex flex-row justify-center items-center my-4">

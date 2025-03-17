@@ -5,11 +5,17 @@ import { useSearchParams } from "react-router-dom";
 import { FilterFactor, getMemoFilterKey, MemoFilter, stringifyFilters, useMemoFilterStore } from "@/store/v1";
 import { useTranslate } from "@/utils/i18n";
 
-const MemoFilters = () => {
+interface MemoFiltersProps {
+  disableFilterRemoval?: boolean;
+  onlyDisplayHashTag?: boolean;
+  hashTagList?: (tags: string[]) => void;  // Function to expose hashTagList to parent
+}
+
+const MemoFilters: React.FC<MemoFiltersProps> = ({ disableFilterRemoval = false, onlyDisplayHashTag = false, hashTagList }) => {
   const t = useTranslate();
   const [, setSearchParams] = useSearchParams();
   const memoFilterStore = useMemoFilterStore();
-  const filters = memoFilterStore.filters;
+  let filters = memoFilterStore.filters;
 
   useEffect(() => {
     const searchParams = new URLSearchParams();
@@ -17,7 +23,20 @@ const MemoFilters = () => {
       searchParams.set("filter", stringifyFilters(filters));
     }
     setSearchParams(searchParams);
-  }, [filters]);
+
+    // Extract hash tags from the filters and pass them to parent via hashTagList
+    if (hashTagList) {
+      const tags = filters
+        .filter((filter) => filter.factor === "tagSearch" && filter.value)
+        .map((filter) => filter.value as string);
+      hashTagList(tags);
+    }
+  }, [filters, hashTagList]);
+
+  // Apply the onlyDisplayHashTag filter
+  if (onlyDisplayHashTag) {
+    filters = filters.filter((filter) => filter.factor === "tagSearch");
+  }
 
   const getFilterDisplayText = (filter: MemoFilter) => {
     if (filter.value) {
@@ -40,7 +59,7 @@ const MemoFilters = () => {
   };
 
   if (filters.length === 0) {
-    return undefined;
+    return null;
   }
 
   return (
@@ -48,14 +67,18 @@ const MemoFilters = () => {
       {filters.map((filter) => (
         <div
           key={getMemoFilterKey(filter)}
-          className="w-auto leading-7 h-7 shrink-0 flex flex-row items-center gap-1 bg-white dark:bg-zinc-800 border dark:border-zinc-700 pl-1.5 pr-1 rounded-md hover:line-through cursor-pointer"
-          onClick={() => memoFilterStore.removeFilter((f) => isEqual(f, filter))}
+          className="w-auto leading-7 h-7 shrink-0 flex flex-row items-center gap-1 bg-white dark:bg-zinc-800 border dark:border-zinc-700 pl-1.5 pr-1 rounded-md"
         >
           <FactorIcon className="w-4 h-auto text-gray-500 dark:text-gray-400 opacity-60" factor={filter.factor} />
           <span className="text-gray-500 dark:text-gray-400 text-sm max-w-32 truncate">{getFilterDisplayText(filter)}</span>
-          <button className="text-gray-500 dark:text-gray-300 opacity-60 hover:opacity-100">
-            <XIcon className="w-4 h-auto" />
-          </button>
+          {!disableFilterRemoval && (
+            <button
+              className="text-gray-500 dark:text-gray-300 opacity-60 hover:opacity-100 cursor-pointer"
+              onClick={() => memoFilterStore.removeFilter((f) => isEqual(f, filter))}
+            >
+              <XIcon className="w-4 h-auto" />
+            </button>
+          )}
         </div>
       ))}
     </div>

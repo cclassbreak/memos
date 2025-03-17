@@ -1,8 +1,8 @@
-import { Divider } from "@mui/joy";
-import { Button } from "@usememos/mui";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
+import { Divider } from "@mui/joy";
+import { Button } from "@usememos/mui";
 import AuthFooter from "@/components/AuthFooter";
 import PasswordSignInForm from "@/components/PasswordSignInForm";
 import { identityProviderServiceClient } from "@/grpcweb";
@@ -16,6 +16,7 @@ import { useTranslate } from "@/utils/i18n";
 
 const SignIn = () => {
   const t = useTranslate();
+  const navigate = useNavigate();
   const currentUser = useCurrentUser();
   const [identityProviderList, setIdentityProviderList] = useState<IdentityProvider[]>([]);
   const workspaceGeneralSetting = workspaceStore.state.generalSetting;
@@ -25,19 +26,25 @@ const SignIn = () => {
     if (currentUser) {
       window.location.href = Routes.ROOT;
     }
-  }, []);
+  }, [currentUser]);
 
-  // Prepare identity provider list.
+  // Fetch Identity Providers and check for auto-redirect condition
   useEffect(() => {
     const fetchIdentityProviderList = async () => {
       const { identityProviders } = await identityProviderServiceClient.listIdentityProviders({});
       setIdentityProviderList(identityProviders);
+
+      // ✅ Auto-redirect if only one Identity Provider exists and password auth is disabled
+      if (identityProviders.length === 1 && workspaceGeneralSetting.disallowPasswordAuth) {
+        handleSignInWithIdentityProvider(identityProviders[0]);
+      }
     };
     fetchIdentityProviderList();
-  }, []);
+  }, [workspaceGeneralSetting.disallowPasswordAuth]);
 
   const handleSignInWithIdentityProvider = async (identityProvider: IdentityProvider) => {
     const stateQueryParameter = `auth.signin.${identityProvider.title}-${extractIdentityProviderIdFromName(identityProvider.name)}`;
+
     if (identityProvider.type === IdentityProvider_Type.OAUTH2) {
       const redirectUri = absolutifyLink("/auth/callback");
       const oauth2Config = identityProvider.config?.oauth2Config;
@@ -50,6 +57,7 @@ const SignIn = () => {
       }&redirect_uri=${redirectUri}&state=${stateQueryParameter}&response_type=code&scope=${encodeURIComponent(
         oauth2Config.scopes.join(" "),
       )}`;
+
       window.location.href = authUrl;
     }
   };

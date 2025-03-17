@@ -30,7 +30,7 @@ const MyAccountSection = () => {
           <PenLineIcon className="w-4 h-4 mx-auto mr-1" />
           {t("common.edit")}
         </Button>
-        <Dropdown>
+        {/* <Dropdown>
           <MenuButton slots={{ root: "div" }}>
             <Button variant="outlined" size="sm">
               <MoreVerticalIcon className="w-4 h-4 mx-auto" />
@@ -39,10 +39,10 @@ const MyAccountSection = () => {
           <Menu className="text-sm" size="sm" placement="bottom">
             <MenuItem onClick={() => showChangeMemberPasswordDialog(user)}>{t("setting.account-section.change-password")}</MenuItem>
           </Menu>
-        </Dropdown>
+        </Dropdown> */}
       </div>
 
-      <AccessTokenSection />
+      {/* <AccessTokenSection /> */}
     </div>
   );
 };

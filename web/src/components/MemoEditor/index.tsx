@@ -32,6 +32,9 @@ import ResourceListView from "./ResourceListView";
 import { handleEditorKeydownWithMarkdownShortcuts, hyperlinkHighlightedText } from "./handlers";
 import { MemoEditorContext } from "./types";
 import "react-datepicker/dist/react-datepicker.css";
+import { matchPath } from "react-router-dom";
+import { Routes } from "@/router";
+import MemoFilters from "../MemoFilters";
 
 export interface Props {
   className?: string;
@@ -64,7 +67,7 @@ const MemoEditor = observer((props: Props) => {
   const resourceStore = useResourceStore();
   const currentUser = useCurrentUser();
   const [state, setState] = useState<State>({
-    memoVisibility: Visibility.PRIVATE,
+    memoVisibility: Visibility.PROTECTED,
     resourceList: [],
     relationList: [],
     location: undefined,
@@ -85,6 +88,7 @@ const MemoEditor = observer((props: Props) => {
       )
     : state.relationList.filter((relation) => relation.type === MemoRelation_Type.REFERENCE);
   const workspaceMemoRelatedSetting = workspaceStore.state.memoRelatedSetting;
+  const [tags, setHashTags] = useState<string[]>([]);
 
   useEffect(() => {
     editorRef.current?.setContent(contentCache || "");
@@ -100,6 +104,11 @@ const MemoEditor = observer((props: Props) => {
     let visibility = userSetting.memoVisibility;
     if (workspaceMemoRelatedSetting.disallowPublicVisibility && visibility === "PUBLIC") {
       visibility = "PRIVATE";
+    }
+    if (Boolean(
+      matchPath(Routes.EXPLORE, window.location.pathname)||
+      matchPath(Routes.INTEGRATE, window.location.pathname))) {
+      visibility = "PROTECTED";
     }
     setState((prevState) => ({
       ...prevState,
@@ -291,7 +300,9 @@ const MemoEditor = observer((props: Props) => {
         isRequesting: true,
       };
     });
-    const content = editorRef.current?.getContent() ?? "";
+    const formatTags = tags.length > 0 ? tags.map(tag => `#${tag}`).join(" ") + " " : "";
+    const content = (formatTags + (editorRef.current?.getContent() ?? ""));
+    
     try {
       // Update memo.
       if (memoName) {
@@ -480,6 +491,7 @@ const MemoEditor = observer((props: Props) => {
           </div>
         </div>
         <Divider className="!mt-2 opacity-40" />
+        <MemoFilters onlyDisplayHashTag={true} hashTagList={setHashTags} disableFilterRemoval={Boolean(matchPath(Routes.INTEGRATE, window.location.pathname))}/>
         <div className="w-full flex flex-row justify-between items-center py-3 gap-2 overflow-auto dark:border-t-zinc-500">
           <div className="relative flex flex-row justify-start items-center" onFocus={(e) => e.stopPropagation()}>
             <Select
@@ -494,11 +506,18 @@ const MemoEditor = observer((props: Props) => {
                 }
               }}
             >
-              {[Visibility.PRIVATE, Visibility.PROTECTED, Visibility.PUBLIC].map((item) => (
-                <Option key={item} value={item} className="whitespace-nowrap !text-sm">
-                  {t(`memo.visibility.${convertVisibilityToString(item).toLowerCase()}` as any)}
-                </Option>
-              ))}
+              {matchPath(Routes.INTEGRATE, window.location.pathname)
+                ? (
+                  <Option key={Visibility.PROTECTED} value={Visibility.PROTECTED} className="whitespace-nowrap !text-sm">
+                    {t(`memo.visibility.${convertVisibilityToString(Visibility.PROTECTED).toLowerCase()}` as any)}
+                  </Option>
+                )
+                : [Visibility.PROTECTED, Visibility.PRIVATE].map((item) => (
+                  <Option key={item} value={item} className="whitespace-nowrap !text-sm">
+                    {t(`memo.visibility.${convertVisibilityToString(item).toLowerCase()}` as any)}
+                  </Option>
+                ))}
+
             </Select>
           </div>
           <div className="shrink-0 flex flex-row justify-end items-center gap-2">

@@ -39,10 +39,10 @@
     "edit": "Edit",
     "email": "Email",
     "expand": "Expand",
-    "explore": "Explore",
+    "explore": "Workspace Shared Memos",
     "file": "File",
     "filter": "Filter",
-    "home": "Home",
+    "home": "Private Memos",
     "image": "Image",
     "in": "In",
     "inbox": "Inbox",
@@ -272,7 +272,13 @@
       "create-a-member": "Create a member",
       "delete-member": "Delete Member",
       "delete-warning": "Are you sure to delete {{username}}? THIS ACTION IS IRREVERSIBLE",
-      "user": "User"
+      "user": "User",
+      "promote-to-admin": "Set as Admin 👨🏻‍💼",
+      "promote-to-admin-warning": "Are you sure to set admin to {{username}}?",
+      "demote-to-user": "Set as User",
+      "demote-to-user-warning": "Are you sure to revoke admin from {{username}}?",
+      "promote-to-host": "Set as Host ⁉",
+      "promote-to-host-warning": "Are you sure to set host to {{username}}?"
     },
     "memo-related": "Memo",
     "memo-related-settings": {

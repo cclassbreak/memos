@@ -185,11 +185,11 @@ const UpdateAccountDialog = ({ destroy }: Props) => {
           onChange={handleNicknameChanged}
           disabled={workspaceGeneralSetting.disallowChangeNickname}
         />
-        <p className="text-sm">
+        {/* <p className="text-sm">
           {t("common.email")}
           <span className="text-sm text-gray-400 ml-1">({t("setting.account-section.email-note")})</span>
         </p>
-        <Input fullWidth type="email" value={state.email} onChange={handleEmailChanged} />
+        <Input fullWidth type="email" value={state.email} onChange={handleEmailChanged} /> */}
         <p className="text-sm">{t("common.description")}</p>
         <Textarea
           className="w-full"
