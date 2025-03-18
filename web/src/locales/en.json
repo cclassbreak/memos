@@ -49,6 +49,7 @@
     "input": "Input",
     "language": "Language",
     "last-updated-at": "Last updated at",
+    "layout": "Layout",
     "learn-more": "Learn more",
     "link": "Link",
     "mark": "Mark",
@@ -160,7 +161,9 @@
       "private": "Private",
       "protected": "Workspace",
       "public": "Public"
-    }
+    },
+    "list": "List",
+    "masonry": "Masonry"
   },
   "message": {
     "archived-successfully": "Archived successfully",
