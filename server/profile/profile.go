@@ -2,10 +2,8 @@ package profile
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -56,34 +54,25 @@ func checkDataDir(dataDir string) (string, error) {
 }
 
 func (p *Profile) Validate() error {
+	// Ensure mode is valid
 	if p.Mode != "demo" && p.Mode != "dev" && p.Mode != "prod" {
 		p.Mode = "demo"
 	}
 
-	if p.Mode == "prod" && p.Data == "" {
-		if runtime.GOOS == "windows" {
-			p.Data = filepath.Join(os.Getenv("ProgramData"), "memos")
-			if _, err := os.Stat(p.Data); os.IsNotExist(err) {
-				if err := os.MkdirAll(p.Data, 0770); err != nil {
-					slog.Error("failed to create data directory", slog.String("data", p.Data), slog.String("error", err.Error()))
-					return err
-				}
-			}
-		} else {
-			p.Data = "/var/opt/memos"
-		}
+	// Ensure address is always localhost
+	if p.Addr == "" {
+		p.Addr = "127.0.0.1"
 	}
 
-	dataDir, err := checkDataDir(p.Data)
-	if err != nil {
-		slog.Error("failed to check dsn", slog.String("data", dataDir), slog.String("error", err.Error()))
-		return err
+	// Ensure Data is explicitly set in config.yaml, default to current folder if empty
+	if p.Data == "" {
+		p.Data = "."
 	}
 
-	p.Data = dataDir
+	// Set DSN for SQLite if not provided
 	if p.Driver == "sqlite" && p.DSN == "" {
 		dbFile := fmt.Sprintf("memos_%s.db", p.Mode)
-		p.DSN = filepath.Join(dataDir, dbFile)
+		p.DSN = filepath.Join(p.Data, dbFile)
 	}
 
 	return nil

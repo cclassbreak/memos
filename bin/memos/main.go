@@ -99,45 +99,27 @@ var (
 )
 
 func init() {
-	viper.SetDefault("mode", "dev")
-	viper.SetDefault("driver", "sqlite")
-	viper.SetDefault("port", 8081)
+	// Set the file name and type
+	viper.SetConfigName("config") // config file name without extension
+	viper.SetConfigType("yaml")   // file type (yaml, json, toml, etc.)
+	viper.AddConfigPath(".")      // Look in the current directory
 
-	rootCmd.PersistentFlags().String("mode", "dev", `mode of server, can be "prod" or "dev" or "demo"`)
-	rootCmd.PersistentFlags().String("addr", "", "address of server")
-	rootCmd.PersistentFlags().Int("port", 8081, "port of server")
-	rootCmd.PersistentFlags().String("data", "", "data directory")
-	rootCmd.PersistentFlags().String("driver", "sqlite", "database driver")
-	rootCmd.PersistentFlags().String("dsn", "", "database source name(aka. DSN)")
-	rootCmd.PersistentFlags().String("instance-url", "", "the url of your memos instance")
-
-	if err := viper.BindPFlag("mode", rootCmd.PersistentFlags().Lookup("mode")); err != nil {
-		panic(err)
-	}
-	if err := viper.BindPFlag("addr", rootCmd.PersistentFlags().Lookup("addr")); err != nil {
-		panic(err)
-	}
-	if err := viper.BindPFlag("port", rootCmd.PersistentFlags().Lookup("port")); err != nil {
-		panic(err)
-	}
-	if err := viper.BindPFlag("data", rootCmd.PersistentFlags().Lookup("data")); err != nil {
-		panic(err)
-	}
-	if err := viper.BindPFlag("driver", rootCmd.PersistentFlags().Lookup("driver")); err != nil {
-		panic(err)
-	}
-	if err := viper.BindPFlag("dsn", rootCmd.PersistentFlags().Lookup("dsn")); err != nil {
-		panic(err)
-	}
-	if err := viper.BindPFlag("instance-url", rootCmd.PersistentFlags().Lookup("instance-url")); err != nil {
-		panic(err)
+	// Read the config file
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Printf("Error reading config file: %v\n", err)
+		os.Exit(1) // Exit if config file is missing or has errors
 	}
 
-	viper.SetEnvPrefix("memos")
-	viper.AutomaticEnv()
-	if err := viper.BindEnv("instance-url", "MEMOS_INSTANCE_URL"); err != nil {
-		panic(err)
-	}
+	fmt.Println("Using config file:", viper.ConfigFileUsed())
+
+	// Bind configuration to variables
+	rootCmd.PersistentFlags().String("mode", viper.GetString("mode"), "server mode (prod/dev/demo)")
+	rootCmd.PersistentFlags().String("addr", viper.GetString("addr"), "server address")
+	rootCmd.PersistentFlags().Int("port", viper.GetInt("port"), "server port")
+	rootCmd.PersistentFlags().String("data", viper.GetString("data"), "data directory")
+	rootCmd.PersistentFlags().String("driver", viper.GetString("driver"), "database driver")
+	rootCmd.PersistentFlags().String("dsn", viper.GetString("dsn"), "database source name (DSN)")
+	rootCmd.PersistentFlags().String("instance-url", viper.GetString("instance-url"), "instance URL")
 }
 
 func printGreetings(profile *profile.Profile) {
