@@ -21,3 +21,4 @@ dist
 .vscode
 proto/gen/*
 proto/gen/api/v1/inbox_service.pb.gw.go
+memos_dev.db
