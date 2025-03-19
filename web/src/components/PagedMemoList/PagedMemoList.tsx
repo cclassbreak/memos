@@ -25,6 +25,7 @@ interface Props {
   filter?: string;
   oldFilter?: string;
   pageSize?: number;
+  disablePullToRefresh?: boolean;
 }
 
 interface LocalState {
@@ -35,6 +36,7 @@ interface LocalState {
 const PagedMemoList = observer((props: Props) => {
   const t = useTranslate();
   const { md } = useResponsiveWidth();
+  const { disablePullToRefresh } = props;
   const memoStore = useMemoStore();
   const memoList = useMemoList();
   const [state, setState] = useState<LocalState>({
@@ -111,7 +113,7 @@ const PagedMemoList = observer((props: Props) => {
   );
 
   // In case of md screen, we don't need pull to refresh.
-  if (md) {
+  if (md || disablePullToRefresh) {
     return children;
   }
 

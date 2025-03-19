@@ -1,0 +1,4 @@
+mode: "dev"
+addr: "127.0.0.1"
+driver: "sqlite"
+port: "3001"

@@ -1,9 +1,10 @@
 import { isEqual } from "lodash-es";
 import { CalendarIcon, CheckCircleIcon, CodeIcon, EyeIcon, HashIcon, LinkIcon, BookmarkIcon, SearchIcon, XIcon } from "lucide-react";
 import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { matchPath, useSearchParams } from "react-router-dom";
 import { FilterFactor, getMemoFilterKey, MemoFilter, stringifyFilters, useMemoFilterStore } from "@/store/v1";
 import { useTranslate } from "@/utils/i18n";
+import { Routes } from "@/router";
 
 interface MemoFiltersProps {
   disableFilterRemoval?: boolean;
@@ -70,7 +71,10 @@ const MemoFilters: React.FC<MemoFiltersProps> = ({ disableFilterRemoval = false,
           className="w-auto leading-7 h-7 shrink-0 flex flex-row items-center gap-1 bg-white dark:bg-zinc-800 border dark:border-zinc-700 pl-1.5 pr-1 rounded-md"
         >
           <FactorIcon className="w-4 h-auto text-gray-500 dark:text-gray-400 opacity-60" factor={filter.factor} />
-          <span className="text-gray-500 dark:text-gray-400 text-sm max-w-32 truncate">{getFilterDisplayText(filter)}</span>
+          <span
+            className={`text-gray-500 dark:text-gray-400 text-sm ${!matchPath(Routes.INTEGRATE, window.location.pathname) ? "max-w-32 truncate" : ""
+              }`}
+          >{getFilterDisplayText(filter)}</span>
           {!disableFilterRemoval && (
             <button
               className="text-gray-500 dark:text-gray-300 opacity-60 hover:opacity-100 cursor-pointer"

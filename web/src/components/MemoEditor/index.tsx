@@ -300,8 +300,7 @@ const MemoEditor = observer((props: Props) => {
         isRequesting: true,
       };
     });
-    const formatTags = tags.length > 0 ? tags.map(tag => `#${tag}`).join(" ") + " " : "";
-    const content = (formatTags + (editorRef.current?.getContent() ?? ""));
+    var content = editorRef.current?.getContent() ?? "";
     
     try {
       // Update memo.
@@ -354,6 +353,14 @@ const MemoEditor = observer((props: Props) => {
         }
       } else {
         // Create memo or memo comment.
+        // Auto add tags to memo in create mode
+        const formatTags = tags
+          .map(tag => `#${tag}`)
+          .filter(tag => !content.split(/\s+/).includes(tag)) // Check only full words
+          .join("");
+
+        content = formatTags ? `${formatTags}\n${content}` : content;
+
         const request = !parentMemoName
           ? memoStore.createMemo({
               memo: Memo.fromPartial({
@@ -490,36 +497,41 @@ const MemoEditor = observer((props: Props) => {
             )}
           </div>
         </div>
-        <Divider className="!mt-2 opacity-40" />
-        <MemoFilters onlyDisplayHashTag={true} hashTagList={setHashTags} disableFilterRemoval={Boolean(matchPath(Routes.INTEGRATE, window.location.pathname))}/>
+        {!memoName && (
+          <>
+            <Divider className="!mt-2 opacity-40" />
+            <MemoFilters
+              onlyDisplayHashTag={true}
+              hashTagList={setHashTags}
+              disableFilterRemoval={Boolean(matchPath(Routes.INTEGRATE, window.location.pathname))}
+            />
+          </>
+        )}
         <div className="w-full flex flex-row justify-between items-center py-3 gap-2 overflow-auto dark:border-t-zinc-500">
-          <div className="relative flex flex-row justify-start items-center" onFocus={(e) => e.stopPropagation()}>
-            <Select
-              className="!text-sm"
-              variant="plain"
-              size="md"
-              value={state.memoVisibility}
-              startDecorator={<VisibilityIcon visibility={state.memoVisibility} />}
-              onChange={(_, visibility) => {
-                if (visibility) {
-                  handleMemoVisibilityChange(visibility);
-                }
-              }}
-            >
-              {matchPath(Routes.INTEGRATE, window.location.pathname)
-                ? (
-                  <Option key={Visibility.PROTECTED} value={Visibility.PROTECTED} className="whitespace-nowrap !text-sm">
-                    {t(`memo.visibility.${convertVisibilityToString(Visibility.PROTECTED).toLowerCase()}` as any)}
-                  </Option>
-                )
-                : [Visibility.PROTECTED, Visibility.PRIVATE].map((item) => (
+          {!Boolean(matchPath(Routes.INTEGRATE, window.location.pathname)) ? (
+            <div className="relative flex flex-row justify-start items-center" onFocus={(e) => e.stopPropagation()}>
+              <Select
+                className="!text-sm"
+                variant="plain"
+                size="md"
+                value={state.memoVisibility}
+                startDecorator={<VisibilityIcon visibility={state.memoVisibility} />}
+                onChange={(_, visibility) => {
+                  if (visibility) {
+                    handleMemoVisibilityChange(visibility);
+                  }
+                }}
+              >
+                {[Visibility.PROTECTED, Visibility.PRIVATE].map((item) => (
                   <Option key={item} value={item} className="whitespace-nowrap !text-sm">
                     {t(`memo.visibility.${convertVisibilityToString(item).toLowerCase()}` as any)}
                   </Option>
                 ))}
-
-            </Select>
-          </div>
+              </Select>
+            </div>
+          ) : (
+            <div></div>
+          )}
           <div className="shrink-0 flex flex-row justify-end items-center gap-2">
             {props.onCancel && (
               <Button variant="plain" disabled={state.isRequesting} onClick={handleCancelBtnClick}>

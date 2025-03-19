@@ -69,6 +69,11 @@ func (p *Profile) Validate() error {
 		p.Data = "."
 	}
 
+	// Ensure set port to 8081 as this is required from frontend dev proxy server if mode is dev
+	if p.IsDev() {
+		p.Port = 8081
+	}
+
 	// Set DSN for SQLite if not provided
 	if p.Driver == "sqlite" && p.DSN == "" {
 		dbFile := fmt.Sprintf("memos_%s.db", p.Mode)

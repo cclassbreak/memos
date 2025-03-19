@@ -1,7 +1,7 @@
 import { Tooltip } from "@mui/joy";
 import { BookmarkIcon, EyeOffIcon, MessageCircleMoreIcon } from "lucide-react";
 import { memo, useCallback, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, matchPath, useLocation } from "react-router-dom";
 import useAsyncEffect from "@/hooks/useAsyncEffect";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useNavigateTo from "@/hooks/useNavigateTo";
@@ -24,6 +24,7 @@ import showPreviewImageDialog from "./PreviewImageDialog";
 import ReactionSelector from "./ReactionSelector";
 import UserAvatar from "./UserAvatar";
 import VisibilityIcon from "./VisibilityIcon";
+import { Routes } from "@/router";
 
 interface Props {
   memo: Memo;
@@ -129,6 +130,7 @@ const MemoView: React.FC<Props> = (props: Props) => {
       )}
       ref={memoContainerRef}
     >
+
       {showEditor ? (
         <MemoEditor
           autoFocus
@@ -140,14 +142,26 @@ const MemoView: React.FC<Props> = (props: Props) => {
         />
       ) : (
         <>
+            {memo.visibility === Visibility.PRIVATE && (
+              <div className="absolute bottom-0 right-0  px-2 py-1 text-xs text-zinc-600 uppercase bg-zinc-100 border border-zinc-300 rounded-lg rotate-12 shadow-md">
+                {t(`memo.visibility.private`)}
+              </div>
+            )}
           <div className="w-full flex flex-row justify-between items-center gap-2">
             <div className="w-auto max-w-[calc(100%-8rem)] grow flex flex-row justify-start items-center">
               {props.showCreator && creator ? (
                 <div className="w-full flex flex-row justify-start items-center">
-                  <Link className="w-auto hover:opacity-80" to={`/u/${encodeURIComponent(creator.username)}`} viewTransition>
+                  {Boolean(matchPath(Routes.INTEGRATE,window.location.pathname)) ? (
                     <UserAvatar className="mr-2 shrink-0" avatarUrl={creator.avatarUrl} />
-                  </Link>
+                  ) : (
+                    <Link className="w-auto hover:opacity-80" to={`/u/${encodeURIComponent(creator.username)}`} viewTransition>
+                    <UserAvatar className="mr-2 shrink-0" avatarUrl={creator.avatarUrl} />
+                    </Link>
+                  )}
                   <div className="w-full flex flex-col justify-center items-start">
+                  {Boolean(matchPath(Routes.INTEGRATE,window.location.pathname)) ? (
+                     creator.nickname || creator.username
+                  ) : (
                     <Link
                       className="w-full block leading-tight hover:opacity-80 truncate text-gray-600 dark:text-gray-400"
                       to={`/u/${encodeURIComponent(creator.username)}`}
@@ -155,12 +169,20 @@ const MemoView: React.FC<Props> = (props: Props) => {
                     >
                       {creator.nickname || creator.username}
                     </Link>
+                  )}
                     <div
-                      className="w-auto -mt-0.5 text-xs leading-tight text-gray-400 dark:text-gray-500 select-none cursor-pointer"
-                      onClick={handleGotoMemoDetailPage}
-                    >
-                      {displayTime}
-                    </div>
+                        className="w-auto -mt-0.5 text-xs leading-tight text-gray-400 dark:text-gray-500 select-none"
+                        onClick={
+                          Boolean(matchPath(Routes.INTEGRATE, window.location.pathname))
+                            ? undefined
+                            : handleGotoMemoDetailPage
+                        }
+                        style={{
+                          cursor: Boolean(matchPath(Routes.INTEGRATE, window.location.pathname)) ? "default" : "pointer"
+                        }}
+                      >
+                        {displayTime}
+                      </div>
                   </div>
                 </div>
               ) : (
@@ -211,7 +233,7 @@ const MemoView: React.FC<Props> = (props: Props) => {
                   <EyeOffIcon className="w-4 h-auto text-amber-500" onClick={() => setShowNSFWContent(false)} />
                 </span>
               )}
-              <MemoActionMenu className="-ml-1" memo={memo} readonly={readonly} onEdit={() => setShowEditor(true)} />
+                <MemoActionMenu className="-ml-1" memo={memo} readonly={readonly} onEdit={() => setShowEditor(true)} />
             </div>
           </div>
           <div
