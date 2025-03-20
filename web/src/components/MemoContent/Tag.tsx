@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { useLocation } from "react-router-dom";
+import { matchPath, useLocation } from "react-router-dom";
 import useNavigateTo from "@/hooks/useNavigateTo";
 import { Routes } from "@/router";
 import { stringifyFilters, useMemoFilterStore } from "@/store/v1";
@@ -45,7 +45,7 @@ const Tag: React.FC<Props> = ({ content }: Props) => {
   return (
     <span
       className={cn("inline-block w-auto text-blue-600 dark:text-blue-400", context.disableFilter ? "" : "cursor-pointer hover:opacity-80")}
-      onClick={handleTagClick}
+      onClick={Boolean(matchPath(Routes.INTEGRATE, window.location.pathname)) ? undefined : handleTagClick}
     >
       #{content}
     </span>
