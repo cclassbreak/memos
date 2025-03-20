@@ -508,7 +508,6 @@ const MemoEditor = observer((props: Props) => {
           </>
         )}
         <div className="w-full flex flex-row justify-between items-center py-3 gap-2 overflow-auto dark:border-t-zinc-500">
-          {!Boolean(matchPath(Routes.INTEGRATE, window.location.pathname)) ? (
             <div className="relative flex flex-row justify-start items-center" onFocus={(e) => e.stopPropagation()}>
               <Select
                 className="!text-sm"
@@ -529,9 +528,6 @@ const MemoEditor = observer((props: Props) => {
                 ))}
               </Select>
             </div>
-          ) : (
-            <div></div>
-          )}
           <div className="shrink-0 flex flex-row justify-end items-center gap-2">
             {props.onCancel && (
               <Button variant="plain" disabled={state.isRequesting} onClick={handleCancelBtnClick}>

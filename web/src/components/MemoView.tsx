@@ -142,11 +142,6 @@ const MemoView: React.FC<Props> = (props: Props) => {
         />
       ) : (
         <>
-            {memo.visibility === Visibility.PRIVATE && (
-              <div className="absolute bottom-0 right-0  px-2 py-1 text-xs text-zinc-600 uppercase bg-zinc-100 border border-zinc-300 rounded-lg rotate-12 shadow-md">
-                {t(`memo.visibility.private`)}
-              </div>
-            )}
           <div className="w-full flex flex-row justify-between items-center gap-2">
             <div className="w-auto max-w-[calc(100%-8rem)] grow flex flex-row justify-start items-center">
               {props.showCreator && creator ? (
@@ -203,6 +198,23 @@ const MemoView: React.FC<Props> = (props: Props) => {
                     </span>
                   </Tooltip>
                 )}
+                  {props.showVisibility && memo.visibility == Visibility.PRIVATE && (
+                    <Tooltip title={t(`memo.visibility.${convertVisibilityToString(memo.visibility).toLowerCase()}` as any)} placement="top">
+                      <span className="flex justify-center items-center hover:opacity-70">
+                        <VisibilityIcon visibility={memo.visibility} />
+                      </span>
+                    </Tooltip>
+                  )}
+                  {memo.visibility === Visibility.PRIVATE && (
+                    <div className="absolute top-0 right-2 px-2 py-1 text-xs text-zinc-600 uppercase bg-zinc-200 border border-zinc-300 rounded-lg rotate-12 shadow-md">
+                      {t(`memo.visibility.private`)}
+                    </div>
+                  )}
+                  {memo.visibility === Visibility.PROTECTED && (
+                    <div className="absolute top-0 right-2 px-2 py-1 text-xs text-blue-600 uppercase bg-blue-100 border border-blue-300 rounded-lg rotate-12 shadow-md">
+                      {t(`memo.visibility.protected`)}
+                    </div>
+                  )}
                 {currentUser && !isArchived && <ReactionSelector className="border-none w-auto h-auto" memo={memo} />}
               </div>
               {!isInMemoDetailPage && (workspaceMemoRelatedSetting.enableComment || commentAmount > 0) && (
