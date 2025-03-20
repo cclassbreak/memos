@@ -191,7 +191,17 @@ const MemoView: React.FC<Props> = (props: Props) => {
             </div>
             <div className="flex flex-row justify-end items-center select-none shrink-0 gap-2">
               <div className="w-auto invisible group-hover:visible flex flex-row justify-between items-center gap-2">
-                {props.showVisibility && memo.visibility !== Visibility.PRIVATE && (
+              {memo.visibility === Visibility.PRIVATE && (
+                  <div className=" top-0 right-2 px-2 py-1 text-xs text-zinc-600 uppercase bg-zinc-200 border border-zinc-300 rounded-lg rotate-12 shadow-md">
+                    {t(`memo.visibility.private`)}
+                  </div>
+                )}
+                {memo.visibility === Visibility.PROTECTED && (
+                  <div className=" top-0 right-2 px-2 py-1 text-xs text-blue-600 uppercase bg-blue-100 border border-blue-300 rounded-lg rotate-12 shadow-md">
+                    {t(`memo.visibility.protected`)}
+                  </div>
+                )}
+                {/* {props.showVisibility && memo.visibility !== Visibility.PRIVATE && (
                   <Tooltip title={t(`memo.visibility.${convertVisibilityToString(memo.visibility).toLowerCase()}` as any)} placement="top">
                     <span className="flex justify-center items-center hover:opacity-70">
                       <VisibilityIcon visibility={memo.visibility} />
@@ -204,17 +214,8 @@ const MemoView: React.FC<Props> = (props: Props) => {
                         <VisibilityIcon visibility={memo.visibility} />
                       </span>
                     </Tooltip>
-                  )}
-                  {memo.visibility === Visibility.PRIVATE && (
-                    <div className="absolute top-0 right-2 px-2 py-1 text-xs text-zinc-600 uppercase bg-zinc-200 border border-zinc-300 rounded-lg rotate-12 shadow-md">
-                      {t(`memo.visibility.private`)}
-                    </div>
-                  )}
-                  {memo.visibility === Visibility.PROTECTED && (
-                    <div className="absolute top-0 right-2 px-2 py-1 text-xs text-blue-600 uppercase bg-blue-100 border border-blue-300 rounded-lg rotate-12 shadow-md">
-                      {t(`memo.visibility.protected`)}
-                    </div>
-                  )}
+                  )} */}
+                  
                 {currentUser && !isArchived && <ReactionSelector className="border-none w-auto h-auto" memo={memo} />}
               </div>
               {!isInMemoDetailPage && (workspaceMemoRelatedSetting.enableComment || commentAmount > 0) && (
